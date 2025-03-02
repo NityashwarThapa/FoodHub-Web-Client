@@ -1,62 +1,52 @@
-// import { expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-// test.describe('Signup Functionality', () => {
-  
-//   test('should successfully register a new user', async ({ page }) => {
-//     await page.goto('/signup');
+test.describe('Signup Page UI Tests', () => {
 
-//     // Fill in the signup form
-//     await page.fill('input[name="name"]', 'Test User');
-//     await page.fill('input[name="email"]', `testuser${Date.now()}@example.com`); // Generate unique email
-//     await page.fill('input[name="mobile_no"]', '9876543210');
-//     await page.fill('input[name="password"]', 'Test@123');
-//     await page.fill('input[name="confirmpassword"]', 'Test@123');
 
-//     // Click the Register button
-//     await page.locator('button:has-text("Register")').click();
+  test('should have a name input field', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('input[name="name"]')).toBeVisible();
+  });
 
-//     // Wait for success toast message
-//     await page.waitForSelector('.toast-success, .alert-success', { timeout: 5000 });
+  test('should have an email input field', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('input[name="email"]')).toBeVisible();
+    await expect(page.locator('input[name="email"]')).toHaveAttribute('type', 'email');
+  });
 
-//     // Wait until navigation to /login happens
-//     await page.waitForLoadState('networkidle'); 
-//     await expect(page).toHaveURL('/login');
-//   });
+  test('should have a mobile number input field', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('input[name="mobile_no"]')).toBeVisible();
+  });
 
-//   test('should show an error for mismatched passwords', async ({ page }) => {
-//     await page.goto('/signup');
+  test('should have a password input field', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('input[name="password"]')).toBeVisible();
+    await expect(page.locator('input[name="password"]')).toHaveAttribute('type', 'password');
+  });
 
-//     await page.fill('input[name="name"]', 'Test User');
-//     await page.fill('input[name="email"]', 'testuser@example.com');
-//     await page.fill('input[name="mobile_no"]', '9876543210');
-//     await page.fill('input[name="password"]', 'Test@123');
-//     await page.fill('input[name="confirmpassword"]', 'WrongPass'); // Mismatch
+  test('should have a confirm password input field', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('input[name="confirmpassword"]')).toBeVisible();
+    await expect(page.locator('input[name="confirmpassword"]')).toHaveAttribute('type', 'password');
+  });
 
-//     await page.locator('button:has-text("Register")').click();
+  test('should have a Register button', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.locator('button:has-text("Register")')).toBeVisible();
+    await expect(page.locator('button:has-text("Register")')).toBeEnabled();
+  });
 
-//     // Wait for the error message to appear (Update selector if needed)
-//     await page.waitForSelector('.text-red-500, .error-message', { timeout: 5000 });
+  test('should have a working Login link', async ({ page }) => {
+    await page.goto('/signup');
 
-//     // Verify error message is displayed
-//     await expect(page.locator('.text-red-500, .error-message')).toBeVisible();
-//   });
+    // Check if "Login Now" link is present
+    const loginLink = page.locator('a:has-text("Login Now")');
+    await expect(loginLink).toBeVisible();
 
-//   test('should not allow signup with invalid email', async ({ page }) => {
-//     await page.goto('/signup');
+    // Click the login link and check if it redirects
+    await loginLink.click();
+    await expect(page).toHaveURL('/login'); // Ensure it goes to the login page
+  });
 
-//     await page.fill('input[name="name"]', 'Test User');
-//     await page.fill('input[name="email"]', 'invalidemail'); // Invalid email
-//     await page.fill('input[name="mobile_no"]', '9876543210');
-//     await page.fill('input[name="password"]', 'Test@123');
-//     await page.fill('input[name="confirmpassword"]', 'Test@123');
-
-//     await page.locator('button:has-text("Register")').click();
-
-//     // Wait for email validation error (Update selector if needed)
-//     await page.waitForSelector('.text-red-500, .error-message', { timeout: 5000 });
-
-//     // Ensure error message is shown
-//     await expect(page.locator('.text-red-500, .error-message')).toBeVisible();
-//   });
-
-// });
+});
