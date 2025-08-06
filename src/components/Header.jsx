@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaShieldAlt, FaCrown } from 'react-icons/fa';
 import { MdClose, MdDashboard, MdOutlineMenu, MdOutlineShoppingBag, MdShoppingCart } from 'react-icons/md';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from '../axios';
 import { AuthContext } from '../context/authContext';
+import { SecurityStatus } from './Security';
 import Switcher from './Switcher';
 
 
@@ -187,23 +188,31 @@ const Header = () => {
                                 <div className="flex items-center ml-4">
 
                                     <div className="flex items-center mr-8 gap-4">
-                                        {/* <div className=" transform cursor-pointer hover:scale-110">
-                                            <Link to={"/wishlist"}>
-                                                <GoHeartFill size={21} strokeWidth={2} fill='white ' />
-                                            </Link>
-                                            
-                                        </div> */}
-
+                                        {/* Security Status Indicator */}
+                                        <div className="hidden sm:block">
+                                            <SecurityStatus 
+                                                isSecure={window.location.protocol === 'https:'}
+                                                sessionStatus="active"
+                                                className="text-xs"
+                                            />
+                                        </div>
 
                                         <div className=" transform cursor-pointer hover:scale-110">
                                             <Link to={"/cartpage"}>
                                                 <MdShoppingCart size={23} />
-
                                             </Link>
                                         </div>
                                     </div>
 
-                                    <div className="flex">
+                                    <div className="flex items-center">
+                                        {/* Role Badge */}
+                                        {(authUser.userDetails?.role === 'admin' || authUser.userDetails?.role === 'super-admin') && (
+                                            <div className="hidden sm:flex items-center mr-3 px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full text-xs font-medium">
+                                                <FaCrown className="w-3 h-3 mr-1" />
+                                                {authUser.userDetails?.role === 'super-admin' ? 'Super Admin' : 'Admin'}
+                                            </div>
+                                        )}
+
                                         <span className="group relative inline-block">
                                             <button
                                                 type="button"
@@ -211,33 +220,51 @@ const Header = () => {
                                                 id="user-menu-button"
                                                 data-dropdown-toggle="dropdown"
                                             >
-                                                <div className=" overflow-hidden rounded-full">
+                                                <div className="overflow-hidden rounded-full ring-2 ring-primary-200 dark:ring-primary-800">
                                                     {authUser.userDetails?.image ? (
                                                         <img
-                                                            className="w-7 rounded-full object-cover object-center sm:w-8 md:w-8 h-7"
+                                                            className="w-8 h-8 rounded-full object-cover object-center"
                                                             src={`${import.meta.env.VITE_APP_BASE_URI}${authUser.userDetails?.image}`}
                                                             alt="user photo"
                                                         />
                                                     ) : (
                                                         <img
-                                                            className="w-7 rounded-full object-cover object-center sm:w-8 md:w-7 h-7 border"
+                                                            className="w-8 h-8 rounded-full object-cover object-center"
                                                             src="/images/avatar.jpg"
                                                             alt="user photo"
                                                         />
                                                     )}
                                                 </div>
-
                                             </button>
 
-                                            <ul className="absolute right-0 hidden pt-1 w-40 p-2 border rounded bg-white text-gray-700 group-hover:block">
+                                            <ul className="absolute right-0 hidden pt-2 w-48 p-2 border border-secondary-200 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 shadow-medium group-hover:block">
+                                                {/* User Info */}
+                                                <div className="px-3 py-2 border-b border-secondary-200 dark:border-secondary-700 mb-2">
+                                                    <p className="text-sm font-medium text-secondary-900 dark:text-white">
+                                                        {authUser.userDetails?.name}
+                                                    </p>
+                                                    <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                                                        {authUser.userDetails?.email}
+                                                    </p>
+                                                    {/* Role indicator in dropdown */}
+                                                    {(authUser.userDetails?.role === 'admin' || authUser.userDetails?.role === 'super-admin') && (
+                                                        <div className="flex items-center mt-1">
+                                                            <FaShieldAlt className="w-3 h-3 text-primary-500 mr-1" />
+                                                            <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">
+                                                                {authUser.userDetails?.role === 'super-admin' ? 'Super Administrator' : 'Administrator'}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
                                                 <Link to={"/profile"}>
-                                                    <li className="cursor-pointer text-gray-600  leading-3 tracking-normal py-2 hover:text-gray-700 focus:text-gray-700 focus:outline-none">
+                                                    <li className="cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-md py-2 px-3 transition-colors duration-200">
                                                         <div className="flex items-center">
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 className="icon icon-tabler icon-tabler-user"
-                                                                width={20}
-                                                                height={20}
+                                                                width={16}
+                                                                height={16}
                                                                 viewBox="0 0 24 24"
                                                                 strokeWidth={2}
                                                                 stroke="currentColor"
@@ -249,41 +276,44 @@ const Header = () => {
                                                                 <circle cx={12} cy={7} r={4} />
                                                                 <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                                             </svg>
-                                                            <span className="ml-2">My Profile</span>
+                                                            <span className="ml-2 text-sm">My Profile</span>
                                                         </div>
                                                     </li>
                                                 </Link>
-                                                {
-                                                    authUser.userDetails.role === 'admin' &&
-                                                    < Link to={"/dashboard"}>
-                                                        <li className="cursor-pointer text-gray-600  leading-3 tracking-normal py-2 hover:text-gray-700 focus:text-gray-700 focus:outline-none">
+                                                
+                                                {(authUser.userDetails?.role === 'admin' || authUser.userDetails?.role === 'super-admin') && (
+                                                    <Link to={"/dashboard"}>
+                                                        <li className="cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-md py-2 px-3 transition-colors duration-200">
                                                             <div className="flex items-center">
-                                                                <MdDashboard />
-                                                                <span className="ml-3">Dashboard</span>
+                                                                <MdDashboard className="w-4 h-4" />
+                                                                <span className="ml-2 text-sm">Dashboard</span>
                                                             </div>
                                                         </li>
                                                     </Link>
-                                                }
-                                                <li
-                                                    onClick={() => logout()}
-                                                    className="cursor-pointer text-gray-600  leading-3 tracking-normal mt-2 py-2 hover:text-gray-700 focus:text-gray-700 focus:outline-none flex items-center"
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        className="h-5 w-6"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
+                                                )}
+
+                                                <div className="border-t border-secondary-200 dark:border-secondary-700 mt-2 pt-2">
+                                                    <li
+                                                        onClick={() => logout()}
+                                                        className="cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-md py-2 px-3 transition-colors duration-200 flex items-center"
                                                     >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                                        />
-                                                    </svg>
-                                                    <span className="ml-2">Log Out</span>
-                                                </li>
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth="2"
+                                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                                            />
+                                                        </svg>
+                                                        <span className="ml-2 text-sm">Log Out</span>
+                                                    </li>
+                                                </div>
                                             </ul>
                                         </span>
                                     </div>
